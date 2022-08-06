@@ -34,7 +34,7 @@
     "typescript": "^4.7.4"
   },
   "lint-staged": {
-    "*.{ts,js}": "eslint --cache --fix"
+    "*.{ts,js}": "eslint . --fix"
   },
   "hooks": {
     "pre-commit": "yarn lint"
