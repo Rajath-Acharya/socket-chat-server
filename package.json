@@ -1,0 +1,31 @@
+{
+  "name": "socket-chat-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Rajath-Acharya/socket-chat-server.git",
+  "author": "Rajath-Acharya <rajath365@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon dist/server.js",
+    "watch": "tsc -w",
+    "build": "tsc --build tsconfig.json",
+    "prepare": "husky install",
+    "error": "eslint .",
+    "fixlint": "eslint . --fix"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.6.4",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
+    "eslint": "^8.21.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "husky": "^8.0.1",
+    "nodemon": "^2.0.19",
+    "typescript": "^4.7.4"
+  }
+}
