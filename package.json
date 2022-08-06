@@ -10,7 +10,7 @@
     "watch": "tsc -w",
     "build": "tsc --build tsconfig.json",
     "error": "eslint .",
-    "lint":"pretty-quick --staged && lint-staged",
+    "lint": "pretty-quick --staged && lint-staged",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -36,5 +36,5 @@
   },
   "hooks": {
     "pre-commit": "yarn lint"
- }
+  }
 }
