@@ -2,6 +2,6 @@ dist
 node_modules
 .eslintrc.js
 coverage
-.env/*
+.env
 husky
 .eslintcache
