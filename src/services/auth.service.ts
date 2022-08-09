@@ -1,8 +1,8 @@
 import { hash, compare } from "bcrypt";
-import { RegisterUserError } from "../types/auth.type";
+import { AuthErrorMessage, JwtPayload } from "../types/auth.type";
 import { UserModel } from "../models/user.model";
 import { v4 as uuidV4 } from "uuid";
-import { getToken } from "../utils/token.helper";
+import { getToken, verifyToken } from "../utils/token.helper";
 import { RefreshTokenModel } from "../models/refreshToken.model";
 
 interface RegisterPayload {
@@ -20,7 +20,7 @@ const createUser = async (payload: RegisterPayload) => {
     const { email, password } = payload;
     const user = await findUserByEmail(email);
     if (user) {
-      throw Error(RegisterUserError.USER_EXISTS);
+      throw new Error(AuthErrorMessage.USER_EXISTS);
     }
     const hashedPassword = await hash(password, 10);
     const userId = uuidV4();
@@ -31,7 +31,7 @@ const createUser = async (payload: RegisterPayload) => {
     });
     return await UserModel.findOne({userId});
   } catch (error: any) {
-    throw Error(error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -40,12 +40,12 @@ const verifyUser = async (payload: RegisterPayload) => {
     const { email, password } = payload;
     const user = await findUserByEmail(email);
     if (!user) {
-      throw Error(RegisterUserError.USER_DOESNOT_EXIST);
+      throw new Error(AuthErrorMessage.USER_DOESNOT_EXIST);
     }
     const passwordInDB = user.password;
     const isValidUser = await compare(password, passwordInDB);
     if (!isValidUser) {
-      throw Error(RegisterUserError.INVALID_PASSWORD);
+      throw new Error(AuthErrorMessage.INVALID_PASSWORD);
     }
     const userId = user.userId;
     const { accessToken, refreshToken } = getToken({ userId});
@@ -63,8 +63,24 @@ const verifyUser = async (payload: RegisterPayload) => {
     }
     return accessToken;
   } catch (error: any) {
-    throw Error(error.message);
+    throw new Error(error.message);
   }
 };
 
-export { createUser, verifyUser };
+const refreshTokenHandler = async (userId:string) => {
+  try {
+    const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY ?? '';
+    const response = await RefreshTokenModel.findOne({userId});
+    const refreshToken = response?.token ?? '';
+    const isValidRefreshToken = verifyToken(refreshToken, refreshTokenSecretKey);
+    if(isValidRefreshToken) {
+      const { refreshToken:newAccessToken } = getToken({ userId});
+      return newAccessToken;
+    }
+  } catch(error:any) {
+    const message = error?.message || "Failed to generate access token";
+    throw new Error(message);
+  }
+}
+
+export { createUser, verifyUser, refreshTokenHandler };

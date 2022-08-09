@@ -1,31 +1,29 @@
-import {Router, Request, Response} from "express";
+import { Router, Request, Response } from "express";
 import { io } from "../server";
-import {MessageModel} from '../models/message.model';
+import { MessageModel } from "../models/message.model";
 
 const messageRouter = Router();
 
-messageRouter.post('/messages',async (req:Request, res:Response) => {
-  const {userId, messageId, message} = req.body;
+messageRouter.post("/messages", async (req: Request, res: Response) => {
+  const { userId, messageId, message } = req.body;
   const messages = new MessageModel({
     parentId: null,
     userId,
     message,
-    messageId
+    messageId,
   });
   try {
     const response = await messages.save();
-    console.log('XX',response);
     io.emit("message", req.body);
     res.status(200).json(response);
-  } catch(error) {
-    console.log('XX',error);
+  } catch (error) {
     res.status(500).send({ error });
   }
 });
 
-messageRouter.get('/messages',async (_, res:Response) => {
+messageRouter.get("/messages", async (_, res: Response) => {
   const messages = await MessageModel.find();
-    return res.status(200).json(messages);
+  return res.status(200).json(messages);
 });
 
 export default messageRouter;
