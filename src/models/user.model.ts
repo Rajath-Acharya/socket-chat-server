@@ -22,10 +22,8 @@ const userSchema = new Schema({
     password: {
       type: 'String',
       required: true,
+      select: false,
     },
-    refreshToken: [{
-      type: 'String'
-    }]
   },
   {
     timestamps: true,
@@ -33,4 +31,4 @@ const userSchema = new Schema({
   }
 );
 
-export const UserModel = model('User', userSchema);
+export const UserModel = model('user', userSchema);

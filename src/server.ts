@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import messageRouter from './controllers/message.controller';
 import authRouter from './controllers/auth.controller';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const PORT = 4040;
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 const server = createServer(app);
 

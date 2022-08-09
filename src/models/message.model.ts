@@ -25,4 +25,4 @@ const schema = new Schema({
 },
 );
 
-export const MessageModel = model('Message', schema);
+export const MessageModel = model('message', schema);

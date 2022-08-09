@@ -7,5 +7,5 @@ export enum RegisterUserError {
 }
 
 export interface JwtPayload {
-  email: string,
+  userId: string,
 }
