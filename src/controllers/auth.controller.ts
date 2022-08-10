@@ -45,25 +45,25 @@ authRouter.post("/login", async (req: Request, res: Response) => {
         httpOnly: true,
       })
       .status(200)
-      .json({ auth: true });
+      .json({ auth: true, accessToken});
   } catch (error: any) {
     res.status(400).send({ error: error.message });
   }
 });
 
-authRouter.post("/refresh-token", async (req: Request, res: Response) => {
+authRouter.post("/refresh-token", async (req:Request, res: Response) => {
   try {
-    const data = req.body;
-    const userId = data.userId;
-    const newAccessToken = await refreshTokenHandler(userId);
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1] || '';
+    const newAccessToken = await refreshTokenHandler(token);
     res
       .cookie("access_token", newAccessToken, {
         httpOnly: true,
       })
       .status(200)
-      .json({ auth: true });
+      .send({ success: true });
   } catch (error: any) {
-    res.status(403).send({ error: error.message });
+    res.status(403).send({ error });
   }
 });
 

@@ -13,10 +13,14 @@ const verifyToken = (token: string, secretKey: string) => {
   return jwt.verify(token, secretKey);
 };
 
+const decodeToken = (token: string) => {
+  return jwt.decode(token);
+};
+
 const getToken = (payload: JwtPayload) => {
   const accessTokenSecretKey = process.env.ACCESS_TOKEN_KEY || "";
   const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY || "";
-  const accessToken = generateToken(payload, accessTokenSecretKey, "1h");
+  const accessToken = generateToken(payload, accessTokenSecretKey, "30s");
   const refreshToken = generateToken(payload, refreshTokenSecretKey, "30d");
   return {
     accessToken,
@@ -24,4 +28,4 @@ const getToken = (payload: JwtPayload) => {
   };
 };
 
-export { generateToken, verifyToken, getToken };
+export { generateToken, verifyToken, getToken, decodeToken };

@@ -4,7 +4,8 @@ export enum AuthErrorMessage {
   PASSWORD_EMPTY = "Password cannot be empty", 
   USER_DOESNOT_EXIST = "User does not exist",
   INVALID_PASSWORD = "Invalid password",
-  TOKEN_NOT_FOUND = "Access token is missing"
+  TOKEN_NOT_FOUND = "Access token is missing",
+  INVALID_TOKEN = "Invalid token"
 }
 
 export interface JwtPayload {

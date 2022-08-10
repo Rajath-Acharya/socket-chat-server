@@ -1,10 +1,11 @@
 import { Router, Request, Response } from "express";
 import { io } from "../server";
 import { MessageModel } from "../models/message.model";
+import { validateRequest } from "../middlewares/auth.middleware";
 
 const messageRouter = Router();
 
-messageRouter.post("/messages", async (req: Request, res: Response) => {
+messageRouter.post("/messages", validateRequest, async (req: Request, res: Response) => {
   const { userId, messageId, message } = req.body;
   const messages = new MessageModel({
     parentId: null,
@@ -21,7 +22,7 @@ messageRouter.post("/messages", async (req: Request, res: Response) => {
   }
 });
 
-messageRouter.get("/messages", async (_, res: Response) => {
+messageRouter.get("/messages", validateRequest, async (_, res: Response) => {
   const messages = await MessageModel.find();
   return res.status(200).json(messages);
 });

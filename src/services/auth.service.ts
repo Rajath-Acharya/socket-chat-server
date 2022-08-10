@@ -2,7 +2,7 @@ import { hash, compare } from "bcrypt";
 import { AuthErrorMessage, JwtPayload } from "../types/auth.type";
 import { UserModel } from "../models/user.model";
 import { v4 as uuidV4 } from "uuid";
-import { getToken, verifyToken } from "../utils/token.helper";
+import { decodeToken, getToken, verifyToken } from "../utils/token.helper";
 import { RefreshTokenModel } from "../models/refreshToken.model";
 
 interface RegisterPayload {
@@ -67,19 +67,20 @@ const verifyUser = async (payload: RegisterPayload) => {
   }
 };
 
-const refreshTokenHandler = async (userId:string) => {
+const refreshTokenHandler = async (token:string) => {
   try {
+    const decoded = decodeToken(token) as JwtPayload;
+    const userId = decoded.userId;
     const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY ?? '';
-    const response = await RefreshTokenModel.findOne({userId});
-    const refreshToken = response?.token ?? '';
+    const refreshTokenInDB = await RefreshTokenModel.findOne({userId});
+    const refreshToken = refreshTokenInDB?.token ?? '';
     const isValidRefreshToken = verifyToken(refreshToken, refreshTokenSecretKey);
     if(isValidRefreshToken) {
       const { refreshToken:newAccessToken } = getToken({ userId});
       return newAccessToken;
     }
   } catch(error:any) {
-    const message = error?.message || "Failed to generate access token";
-    throw new Error(message);
+    throw new Error(error);
   }
 }
 
