@@ -2,7 +2,12 @@ import { hash, compare } from "bcrypt";
 import { AuthErrorMessage, JwtPayload } from "../types/auth.type";
 import { UserModel } from "../models/user.model";
 import { v4 as uuidV4 } from "uuid";
-import { decodeToken, getToken, verifyToken } from "../utils/token.helper";
+import {
+  decodeToken,
+  getAccessToken,
+  getRefreshToken,
+  verifyToken,
+} from "../utils/token.helper";
 import { RefreshTokenModel } from "../models/refreshToken.model";
 
 interface RegisterPayload {
@@ -11,7 +16,7 @@ interface RegisterPayload {
 }
 
 const findUserByEmail = async (email: string) => {
-  const user = await UserModel.findOne({ email }).select('+password');
+  const user = await UserModel.findOne({ email }).select("+password");
   return user;
 };
 
@@ -29,7 +34,7 @@ const createUser = async (payload: RegisterPayload) => {
       email,
       password: hashedPassword,
     });
-    return await UserModel.findOne({userId});
+    return await UserModel.findOne({ userId });
   } catch (error: any) {
     throw new Error(error.message);
   }
@@ -48,9 +53,10 @@ const verifyUser = async (payload: RegisterPayload) => {
       throw new Error(AuthErrorMessage.INVALID_PASSWORD);
     }
     const userId = user.userId;
-    const { accessToken, refreshToken } = getToken({ userId});
+    const accessToken = getAccessToken({ userId });
+    const refreshToken = getRefreshToken({ userId });
     const refreshTokenInDB = await RefreshTokenModel.findOne({ userId });
-    if(refreshTokenInDB) {
+    if (refreshTokenInDB) {
       await RefreshTokenModel.updateOne({
         userId,
         token: refreshToken,
@@ -67,21 +73,24 @@ const verifyUser = async (payload: RegisterPayload) => {
   }
 };
 
-const refreshTokenHandler = async (token:string) => {
+const refreshTokenHandler = async (token: string) => {
   try {
     const decoded = decodeToken(token) as JwtPayload;
     const userId = decoded.userId;
-    const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY ?? '';
-    const refreshTokenInDB = await RefreshTokenModel.findOne({userId});
-    const refreshToken = refreshTokenInDB?.token ?? '';
-    const isValidRefreshToken = verifyToken(refreshToken, refreshTokenSecretKey);
-    if(isValidRefreshToken) {
-      const { refreshToken:newAccessToken } = getToken({ userId});
-      return newAccessToken;
+    const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY ?? "";
+    const refreshTokenInDB = await RefreshTokenModel.findOne({ userId });
+    const refreshToken = refreshTokenInDB?.token ?? "";
+    const isValidRefreshToken = verifyToken(
+      refreshToken,
+      refreshTokenSecretKey
+    );
+    if (isValidRefreshToken) {
+      const accessToken = getAccessToken({ userId });
+      return accessToken;
     }
-  } catch(error:any) {
+  } catch (error: any) {
     throw new Error(error);
   }
-}
+};
 
 export { createUser, verifyUser, refreshTokenHandler };

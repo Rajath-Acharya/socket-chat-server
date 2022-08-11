@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import { JwtPayload } from "../types/auth.type";
 
+const ACCESS_TOKEN_DURATION = "30s";
+const REFRESH_TOKEN_DURATION = "30d";
+
 const generateToken = (
   payload: JwtPayload,
   secretKey: string,
@@ -17,15 +20,30 @@ const decodeToken = (token: string) => {
   return jwt.decode(token);
 };
 
-const getToken = (payload: JwtPayload) => {
+const getAccessToken = (payload: JwtPayload) => {
   const accessTokenSecretKey = process.env.ACCESS_TOKEN_KEY || "";
-  const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY || "";
-  const accessToken = generateToken(payload, accessTokenSecretKey, "30s");
-  const refreshToken = generateToken(payload, refreshTokenSecretKey, "30d");
-  return {
-    accessToken,
-    refreshToken,
-  };
+  const accessToken = generateToken(
+    payload,
+    accessTokenSecretKey,
+    ACCESS_TOKEN_DURATION
+  );
+  return accessToken;
 };
 
-export { generateToken, verifyToken, getToken, decodeToken };
+const getRefreshToken = (payload: JwtPayload) => {
+  const accessTokenSecretKey = process.env.REFRESH_TOKEN_KEY || "";
+  const refreshToken = generateToken(
+    payload,
+    accessTokenSecretKey,
+    REFRESH_TOKEN_DURATION
+  );
+  return refreshToken;
+};
+
+export {
+  generateToken,
+  verifyToken,
+  decodeToken,
+  getAccessToken,
+  getRefreshToken,
+};
