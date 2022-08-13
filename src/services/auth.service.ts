@@ -83,4 +83,10 @@ const refreshTokenHandler = async (token: string) => {
     }
 };
 
-export { createUser, verifyUser, refreshTokenHandler };
+const logoutHandler = async (token: string) => {
+  const decoded = decodeToken(token) as JwtPayload;
+  const userId = decoded.userId;
+  await RefreshTokenModel.deleteOne({userId});  
+}
+
+export { createUser, verifyUser, refreshTokenHandler,logoutHandler };
