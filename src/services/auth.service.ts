@@ -11,6 +11,7 @@ import {
 import { RefreshTokenModel } from "../models/refreshToken.model";
 
 interface RegisterPayload {
+  userName?: string,
   email: string;
   password: string;
 }
@@ -21,8 +22,7 @@ const findUserByEmail = async (email: string) => {
 };
 
 const createUser = async (payload: RegisterPayload) => {
-  try {
-    const { email, password } = payload;
+    const { userName, email, password } = payload;
     const user = await findUserByEmail(email);
     if (user) {
       throw new Error(AuthErrorMessage.USER_EXISTS);
@@ -31,17 +31,14 @@ const createUser = async (payload: RegisterPayload) => {
     const userId = uuidV4();
     await UserModel.create({
       userId,
+      userName,
       email,
       password: hashedPassword,
     });
     return await UserModel.findOne({ userId });
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
 };
 
 const verifyUser = async (payload: RegisterPayload) => {
-  try {
     const { email, password } = payload;
     const user = await findUserByEmail(email);
     if (!user) {
@@ -68,13 +65,9 @@ const verifyUser = async (payload: RegisterPayload) => {
       });
     }
     return accessToken;
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
 };
 
 const refreshTokenHandler = async (token: string) => {
-  try {
     const decoded = decodeToken(token) as JwtPayload;
     const userId = decoded.userId;
     const refreshTokenSecretKey = process.env.REFRESH_TOKEN_KEY ?? "";
@@ -88,9 +81,6 @@ const refreshTokenHandler = async (token: string) => {
       const accessToken = getAccessToken({ userId });
       return accessToken;
     }
-  } catch (error: any) {
-    throw new Error(error);
-  }
 };
 
 export { createUser, verifyUser, refreshTokenHandler };

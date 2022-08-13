@@ -9,8 +9,11 @@ import {
 const authRouter = Router();
 
 authRouter.post("/register", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { userName, email, password } = req.body;
   try {
+    if (!userName) {
+      throw Error(AuthErrorMessage.USERNAME_ERROR);
+    }
     if (!email) {
       throw Error(AuthErrorMessage.EMAIL_ERROR);
     }
@@ -18,12 +21,13 @@ authRouter.post("/register", async (req: Request, res: Response) => {
       throw Error(AuthErrorMessage.PASSWORD_EMPTY);
     }
     const response = await createUser({
+      userName,
       email,
       password,
     });
     res.status(201).json({ data: response });
   } catch (error: any) {
-    res.status(400).send({ error: error.message });
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -47,7 +51,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       .status(200)
       .json({ auth: true, accessToken});
   } catch (error: any) {
-    res.status(400).send({ error: error.message });
+    res.status(400).send({ message: error.message });
   }
 });
 
