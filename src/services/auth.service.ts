@@ -52,18 +52,7 @@ const verifyUser = async (payload: RegisterPayload) => {
     const userId = user.userId;
     const accessToken = getAccessToken({ userId });
     const refreshToken = getRefreshToken({ userId });
-    const refreshTokenInDB = await RefreshTokenModel.findOne({ userId });
-    if (refreshTokenInDB) {
-      await RefreshTokenModel.updateOne({
-        userId,
-        token: refreshToken,
-      });
-    } else {
-      await RefreshTokenModel.create({
-        userId,
-        token: refreshToken,
-      });
-    }
+    await RefreshTokenModel.findOneAndUpdate({ userId }, { token: refreshToken } ,{ upsert: true });
     return accessToken;
 };
 

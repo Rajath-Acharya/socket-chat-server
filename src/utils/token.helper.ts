@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { JwtPayload } from "../types/auth.type";
 
-const ACCESS_TOKEN_DURATION = "30s";
+const ACCESS_TOKEN_DURATION = "1d";
 const REFRESH_TOKEN_DURATION = "30d";
 
 const generateToken = (
@@ -13,7 +13,13 @@ const generateToken = (
 };
 
 const verifyToken = (token: string, secretKey: string) => {
-  return jwt.verify(token, secretKey);
+  try {
+    return jwt.verify(token, secretKey);
+  } catch(e) {
+    console.log('XX',e);
+    
+    throw Error('x');
+  }
 };
 
 const decodeToken = (token: string) => {

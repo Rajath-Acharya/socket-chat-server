@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { io } from "../server";
+// import { io } from "../server"; 
 import { MessageModel } from "../models/message.model";
 import { validateRequest } from "../middlewares/auth.middleware";
 
@@ -15,7 +15,7 @@ messageRouter.post("/messages", validateRequest, async (req: Request, res: Respo
   });
   try {
     const response = await messages.save();
-    io.emit("message", req.body);
+    // io.emit("message", req.body);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).send({ error });

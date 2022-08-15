@@ -16,7 +16,7 @@ const validateRequest = (req:Request, res:Response, next: NextFunction) => {
     }
     const accessTokenSecretKey = process.env.ACCESS_TOKEN_KEY ?? '';
     verifyToken(token, accessTokenSecretKey);
-    res.locals.token = token;
+    res.locals.userId = userId;
     next();
   } catch(error:any) {
     return res.status(401).json({error});
