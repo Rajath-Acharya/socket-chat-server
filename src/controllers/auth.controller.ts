@@ -46,9 +46,6 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       password,
     });
     res
-      .cookie("access_token", accessToken, {
-        httpOnly: true,
-      })
       .status(200)
       .json({ auth: true, accessToken});
   } catch (error: any) {
@@ -62,11 +59,8 @@ authRouter.post("/refresh-token", async (req:Request, res: Response) => {
     const token = authHeader && authHeader.split(' ')[1] || '';
     const newAccessToken = await refreshTokenHandler(token);
     res
-      .cookie("access_token", newAccessToken, {
-        httpOnly: true,
-      })
       .status(200)
-      .send({ success: true });
+      .json({ accessToken: newAccessToken });
   } catch (error: any) {
     res.status(403).send({ error });
   }
@@ -78,7 +72,6 @@ authRouter.delete("/logout", async (req:Request, res:Response) => {
     const token = authHeader && authHeader.split(' ')[1] || '';
     await logoutHandler(token);
     res
-    .clearCookie("access_token")
     .send({ success: true });
     
   } catch(error:any) {
